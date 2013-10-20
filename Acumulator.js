@@ -64,8 +64,13 @@ Acumulator.prototype = {
 	data:			null,
 	is_group:		false,
 	group:			null,
-	callback:		function(data){
+	callback:		function(data) {
 		console.log(JSON.stringify(data));
+	},
+	sub:			function(sub) {
+		if(this.is_group && this.group[sub]) {
+			return this.group[sub];
+		}
 	},
 	agregator: {
 		the_last_one:		function(value, callback) {
