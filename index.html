@@ -5,25 +5,32 @@
 	<body>
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
-				var onoff = document.querySelector("button#onoff");
-				onoff.acumulator = new Acumulator("the_last_one", function(cmd){
-					var stat = onoff.querySelector("span#status");
-					stat.innerHTML = status.innerHTML == "on" ? "off" : "on";
+				window.acumulator = new Acumulator({
+					onoff:	[
+							"the_last_one",
+							function(cmd){
+								console.log("callback of onoff");
+								var stat = onoff.querySelector("span#status");
+								if(cmd == "toggle") {
+									stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
+								}
+							}
+						],
+					sum:	[
+							"somatory",
+							function(value){
+								var stat = sum.querySelector("span#status");
+								stat.innerHTML = parseInt(stat.innerHTML) + value;
+							}
+						]
 				});
-				onoff.acumulator.waiting_time = 100;
-				var sum = document.querySelector("button#sum");
-				sum.acumulator = new Acumulator("somatory", function(value){
-console.log(value);
-					var stat = sum.querySelector("span#status");
-					stat.innerHTML = parseInt(stat.innerHTML) + value;
-				});
-				sum.acumulator.waiting_time = 500;
+				window.acumulator.waiting_time = 500;
 			}, false);
 		</script>
-		<button id="onoff" onclick="this.acumulator.push('toggle')">
+		<button id="onoff" onclick="window.acumulator.group[this.id].push('toggle')">
 		<span id="status">off</span>
 		</button>
-		<button id="sum" onclick="this.acumulator.push(1)">
+		<button id="sum" onclick="window.acumulator.group[this.id].push(1)">
 		<span id="status">0</span>
 		</button>
 	</body>
