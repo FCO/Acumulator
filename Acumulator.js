@@ -25,31 +25,25 @@ Acumulator.prototype = {
 	agregator: {
 		the_last_one:		function(value, callback) {
 			this.val	= value;
-			this.cb		= callback;
 		},
 		the_first_one:		function(value, callback) {
 			if(this.val == null) this.val	= value;
-			if(this.cb  == null) this.cb	= callback;
 		},
 		acumulate_array:	function(value, callback) {
 			if(this.val == null) this.val	= [];
 			this.val.push(value);
-			this.cb = callback;
 		},
 		counter:		function(value, callback) {
 			if(this.val == null) this.val	= 0;
 			this.val++;
-			this.cb		= callback;
 		},
 		somatory:		function(value, callback) {
 			if(this.val == null) this.val	= 0;
 			this.val	+= value;
-			this.cb		= callback;
 		},
 		concat:			function(value, callback) {
 			if(this.val == null) this.val	= "";
 			this.val	+= value;
-			this.cb		= callback;
 		},
 	},
 	push:			function(value) {
@@ -61,7 +55,6 @@ Acumulator.prototype = {
 				_this.tid = null;
 				_this.callback.call(_this, _this.data.val);
 				_this.data.val	= null;
-				_this.data.cb	= null;
 			}, this.waiting_time);
 		}
 	},

@@ -3,5 +3,26 @@
 		<script src="Acumulator.js"></script>
 	</head>
 	<body>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				var onoff = document.querySelector("button#onoff");
+				onoff.acumulator = new Acumulator("the_last_one", function(cmd){
+					var stat = onoff.querySelector("span#status");
+					stat.innerHTML = status.innerHTML == "on" ? "off" : "on";
+				});
+				var sum = document.querySelector("button#sum");
+				sum.acumulator = new Acumulator("somatory", function(value){
+console.log(value);
+					var stat = sum.querySelector("span#status");
+					stat.innerHTML = parseInt(stat.innerHTML) + value;
+				});
+			}, false);
+		</script>
+		<button id="onoff" onclick="this.acumulator.push('toggle')">
+		<span id="status">off</span>
+		</button>
+		<button id="sum" onclick="this.acumulator.push(1)">
+		<span id="status">0</span>
+		</button>
 	</body>
 </html>
