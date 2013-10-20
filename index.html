@@ -10,12 +10,14 @@
 					var stat = onoff.querySelector("span#status");
 					stat.innerHTML = status.innerHTML == "on" ? "off" : "on";
 				});
+				onoff.acumulator.waiting_time = 100;
 				var sum = document.querySelector("button#sum");
 				sum.acumulator = new Acumulator("somatory", function(value){
 console.log(value);
 					var stat = sum.querySelector("span#status");
 					stat.innerHTML = parseInt(stat.innerHTML) + value;
 				});
+				sum.acumulator.waiting_time = 500;
 			}, false);
 		</script>
 		<button id="onoff" onclick="this.acumulator.push('toggle')">
