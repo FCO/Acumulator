@@ -51,9 +51,8 @@ Acumulator.prototype = {
 				if(this.group.hasOwnProperty(key))
 					this.group[key].waiting_time = data;
 			}
-		} else {
-			this._waiting_time = data;
 		}
+		this._waiting_time = data;
 	},
 	set delayable(data) {
 		if(this.is_group) {
@@ -61,9 +60,8 @@ Acumulator.prototype = {
 				if(this.group.hasOwnProperty(key))
 					this.group[key].delayable = data;
 			}
-		} else {
-			this._delayable = data;
 		}
+		this._delayable = data;
 	},
 	data:			null,
 	is_group:		false,
@@ -108,8 +106,11 @@ Acumulator.prototype = {
 			}
 		} else {
 			this.agregator_func.call(this.data, value, this.callback);
-			if(this.tid && this.delayable) clearTimeout(this.tid);
-			if(!this.tid || this.delayable) {
+			if(this.tid && this.delayable) {
+				clearTimeout(this.tid);
+				this.tid = null;
+			}
+			if(!this.tid) {
 				var _this = this;
 				this.tid = setTimeout(function(){
 					_this.tid = null;
