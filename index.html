@@ -7,7 +7,7 @@
 			document.addEventListener("DOMContentLoaded", function() {
 				window.acum = new Acumulator({
 					onoff:	[
-							"the_last_one",
+							"the_first_one",
 							function(cmd) {
 								console.log("callback of onoff");
 								var stat = onoff.querySelector("span#status");
@@ -23,25 +23,15 @@
 								stat.innerHTML = parseInt(stat.innerHTML) + value;
 							}
 						],
-					vkey1:	[
+					form:	[
 							"the_last_one",
-							function(value) {
-								var vkey1 = document.querySelector("td#vkey1");
-								vkey1.innerHTML = value;
-							}
-						],
-					vkey2:	[
-							"the_last_one",
-							function(value) {
-								var vkey2 = document.querySelector("td#vkey2");
-								vkey2.innerHTML = value;
-							}
-						],
-					vkey3:	[
-							"the_last_one",
-							function(value) {
-								var vkey3 = document.querySelector("td#vkey3");
-								vkey3.innerHTML = value;
+							function(parentForm) {
+								var elem = parentForm.elements;
+								for(var i = 0; i < elem.length; i++) {
+									if(! elem[i].name) continue;
+									var vkey = document.querySelector("td#" + elem[i].name);
+									vkey.innerHTML = elem[i].value;
+								}
 							}
 						],
 				});
@@ -59,10 +49,10 @@
 			<tr><td>key2</td><td id="vkey2">value2</td></tr>
 			<tr><td>key3</td><td id="vkey3">value3</td></tr>
 		</table>
-		<form onsubmit="return false;">
-			key1: <input id=vkey1 value="value1" onkeyup="window.acum.sub(this.id).push(this.value)"><br />
-			key2: <input id=vkey2 value="value2" onkeyup="window.acum.sub(this.id).push(this.value)"><br />
-			key3: <input id=vkey3 value="value3" onkeyup="window.acum.sub(this.id).push(this.value)"><br />
+		<form>
+			key1: <input name=vkey1 value="value1" onkeyup="window.acum.sub('form').push(this.parentNode)"><br />
+			key2: <input name=vkey2 value="value2" onkeyup="window.acum.sub('form').push(this.parentNode)"><br />
+			key3: <input name=vkey3 value="value3" onkeyup="window.acum.sub('form').push(this.parentNode)"><br />
 			<input type=submit>
 		</form>
 	</body>

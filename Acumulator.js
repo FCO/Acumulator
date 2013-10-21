@@ -1,14 +1,12 @@
 function Acumulator(agregator_func, callback) {
 	this.group = {};
 	if(agregator_func instanceof Object) {
-		console.log("agregator_func is a Object");
 		this.is_group = true;
 		for(var key in agregator_func) {
 			if(agregator_func.hasOwnProperty(key))
 				this.group[key] = new Acumulator(agregator_func[key][0], agregator_func[key][1]);
 		}
 	} else if(callback instanceof Object && !callback instanceof Function) {
-		console.log("callback is a Object");
 		this.is_group = true;
 		for(var key in callback) {
 			if(callback.hasOwnProperty(key))
