@@ -9,7 +9,6 @@
 					onoff:	[
 							"the_first_one",
 							function(cmd) {
-								console.log("callback of onoff");
 								var stat = onoff.querySelector("span#status");
 								if(cmd == "toggle") {
 									stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
@@ -23,17 +22,17 @@
 								stat.innerHTML = parseInt(stat.innerHTML) + value;
 							}
 						],
-					form:	[
-							"the_last_one",
-							function(parentForm) {
-								var elem = parentForm.elements;
-								for(var i = 0; i < elem.length; i++) {
-									if(! elem[i].name) continue;
-									var vkey = document.querySelector("td#" + elem[i].name);
-									vkey.innerHTML = elem[i].value;
-								}
-							}
-						],
+					form:	{
+							agregator_func: "the_last_one",
+							callback:	function(parentForm) {
+										var elem = parentForm.elements;
+										for(var i = 0; i < elem.length; i++) {
+											if(! elem[i].name) continue;
+											var vkey = document.querySelector("td#" + elem[i].name);
+											vkey.innerHTML = elem[i].value;
+										}
+									}
+						},
 				});
 				window.acum.waiting_time = 500;
 			}, false);

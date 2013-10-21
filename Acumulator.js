@@ -3,14 +3,19 @@ function Acumulator(agregator_func, callback) {
 	if(agregator_func instanceof Object) {
 		this.is_group = true;
 		for(var key in agregator_func) {
-			if(agregator_func.hasOwnProperty(key))
-				this.group[key] = new Acumulator(agregator_func[key][0], agregator_func[key][1]);
+			if(agregator_func.hasOwnProperty(key)) {
+				if(agregator_func[key] instanceof Array)
+					this.group[key] = new Acumulator(agregator_func[key][0], agregator_func[key][1]);
+				else
+					this.group[key] = new Acumulator(agregator_func[key].agregator_func, agregator_func[key].callback);
+			}
 		}
 	} else if(callback instanceof Object && !callback instanceof Function) {
 		this.is_group = true;
 		for(var key in callback) {
-			if(callback.hasOwnProperty(key))
+			if(callback.hasOwnProperty(key)) {
 				this.group[key] = new Acumulator(agregator_func, callback[key]);
+			}
 		}
 	} else {
 		this.agregator_func = this.agregator.the_last_one;
@@ -20,10 +25,11 @@ function Acumulator(agregator_func, callback) {
 			if(agregator_func instanceof Function) {
 				this.agregator_func = agregator_func;
 			} else {
-				if(this.agregator[agregator_func])
+				if(this.agregator[agregator_func]) {
 					this.agregator_func = this.agregator[agregator_func];
-				else
+				} else {
 					throw "Agregator function '" + agregator_func + "' does not exists."
+				}
 			}
 		}
 		this.data		= {val: null};
