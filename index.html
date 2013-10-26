@@ -41,9 +41,14 @@
 										setTimeout(function(){
 											save.innerHTML = "";
 										}, 3000);
-									}
+									},
+							condition2exec:	function() {
+								return navigator.onLine;
+							}
 						},
 				});
+				window.acum.condition2exec = function(){return navigator.onLine};
+				window.addEventListener('online', function(){window.acum.try2run()});
 				window.acum.waiting_time = 500;
 				window.acum.sub("save").waiting_time = 2000;
 			}, false);
