@@ -70,7 +70,6 @@ Acumulator.prototype = {
 		return this._push_data_on_event;
 	},
 	set push_data_on_event(data) {
-		console.log(data);
 		var _this = this;
 		this._push_data_on_event = data;
 		this._add_event_listener({
