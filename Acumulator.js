@@ -13,13 +13,6 @@ function Acumulator(conf) {
 		}
 	}
 	if(this.agregator_func == null) this.agregator_func = this.agregator.the_last_one;
-	if(!(this.agregator_func instanceof Function)) {
-		if(this.agregator[this.agregator_func]) {
-			this.agregator_func = this.agregator[this.agregator_func];
-		} else {
-			throw "Agregator function '" + agregator_func + "' does not exists."
-		}
-	}
 	if(localStorage.getItem(this.storageKey) != null) {
 		this.data = JSON.parse(localStorage.getItem(this.storageKey));
 	} else {
@@ -57,6 +50,60 @@ Acumulator.prototype = {
 		}
 		this._delayable = data;
 	},
+	_agregator_func:	null,
+	get agregator_func() {
+		return this._agregator_func;
+	},
+	set agregator_func(data) {
+		if(data instanceof Function) {
+			this._agregator_func = data;
+		} else {
+			if(this.agregator[data] != null) {
+				this.agregator_func = this.agregator[data];
+			} else {
+				throw "Agregator function '" + data + "' does not exists."
+			}
+		}
+	},
+	_push_data_on_event:	null,
+	get push_data_on_event() {
+		return this._push_data_on_event;
+	},
+	set push_data_on_event(data) {
+		console.log(data);
+		var _this = this;
+		this._push_data_on_event = data;
+		this._add_event_listener({
+			obj:	data.obj,
+			event:	data.event,
+			func:	function(){_this.push(data.data != null && data.data instanceof Function ? data.data.call(this) : data.data)}
+		});
+	},
+	_retry_on_event:	null,
+	get retry_on_event() {
+		return this._retry_on_event;
+	},
+	set retry_on_event(data) {
+		var _this = this;
+		this._retry_on_event = data;
+		this._add_event_listener({
+			obj:	data.obj,
+			event:	data.event,
+			func:	function(){_this.try2run()}
+		});
+	},
+	_add_event_listener:	function(data) {
+		var objs = data.obj   instanceof NodeList ? Array.prototype.slice.call(data.obj)   : data.obj  ;
+		var evts = data.event instanceof NodeList ? Array.prototype.slice.call(data.event) : data.event;
+		objs = objs instanceof Array ? objs : [objs];
+		evts = evts instanceof Array ? evts : [evts];
+
+		for(var i = 0; i < objs.length; i++) {
+			for(var j = 0; j < evts.length; j++) {
+				objs[i].addEventListener(evts[j], data.func);
+			}
+		}
+	},
 	data:			null,
 	is_group:		false,
 	group:			null,
@@ -68,7 +115,12 @@ Acumulator.prototype = {
 			return this.group[sub];
 		}
 	},
-	agregator: {
+	condition:	{
+		online:			function() {
+			return navigator.onLine;
+		}
+	},
+	agregator:	{
 		the_last_one:		function(value) {
 			this.val	= value;
 		},
@@ -103,7 +155,15 @@ Acumulator.prototype = {
 					this.group[key].condition2exec = data;
 			}
 		}
-		this._condition2exec = data;
+		if(data instanceof Function) {
+			this._condition2exec = data;
+		} else {
+			if(this.condition[data] != null) {
+				this.condition2exec = this.condition[data];
+			} else {
+				throw "Condition to execute '" + data + "' does not exists."
+			}
+		}
 	},
 	get storageKey() {
 		return "acumulator:" + this.id

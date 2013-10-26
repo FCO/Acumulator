@@ -13,6 +13,11 @@
 											if(cmd == "toggle") {
 												stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
 											}
+										},
+							_push_data_on_event:	{
+											obj:	document.querySelector("button#onoff"),
+											event:	"click",
+											data:	"toggle"
 										}
 						},
 					sum:	{
@@ -20,6 +25,11 @@
 							_callback:		function(value) {
 											var stat = sum.querySelector("span#status");
 											stat.innerHTML = parseInt(stat.innerHTML) + value;
+										},
+							_push_data_on_event:	{
+											obj:	document.querySelector("button#sum"),
+											event:	"click",
+											data:	1
 										}
 						},
 					form:	{
@@ -31,7 +41,12 @@
 											var vkey = document.querySelector("td#" + elem[i].name);
 											vkey.innerHTML = elem[i].value;
 										}
-									}
+									},
+							_push_data_on_event:	{
+											obj:	document.forms[0].querySelectorAll("input"),
+											event:	"keyup",
+											data:	document.forms[0]
+										}
 						},
 					save:	{
 							_agregator_func: "the_last_one",
@@ -42,20 +57,30 @@
 											save.innerHTML = "";
 										}, 3000);
 									},
-							_waiting_time:	2000
+							_waiting_time:	2000,
+							_push_data_on_event:	{
+											obj:	document.querySelector("textarea"),
+											event:	"keyup",
+											data:	"bla"
+//											data:	function() {
+//console.log(this);
+//												return this.value;
+//											}
+										}
 						},
-					_condition2exec:	function() {
-						return navigator.onLine;
-					},
-					_waiting_time: 500
+					_condition2exec: "online",
+					_waiting_time: 500,
+					_retry_on_event: {
+						obj:	window,
+						event:	"online"
+					}
 				});
-				window.addEventListener('online', function(){window.acum.try2run()});
 			}, false);
 		</script>
-		<button id="onoff" onclick="window.acum.sub(this.id).push('toggle')">
+		<button id="onoff">
 		<span id="status">off</span>
 		</button>
-		<button id="sum" onclick="window.acum.sub(this.id).push(1)">
+		<button id="sum">
 		<span id="status">0</span>
 		</button>
 		<table>
@@ -69,6 +94,6 @@
 			key3: <input name=vkey3 value="value3" onkeyup="window.acum.sub('form').push(this.parentNode)"><br />
 		</form><br />
 		<span id=save style="background-color: yellow"></span><br />
-		<textarea cols=50 rows=10 onkeyup="window.acum.sub('save').push(this.value)"></textarea>
+		<textarea cols=50 rows=10></textarea>
 	</body>
 </html>
