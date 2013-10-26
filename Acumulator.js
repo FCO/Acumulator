@@ -26,16 +26,19 @@ Acumulator.next_id = 0;
 Acumulator.prototype = {
 	_waiting_time:		null,
 	_delayable:		null,
+	is_conf_setted:		function(conf) {
+		return this["_" + conf] != null;
+	},
 	get waiting_time() {
 		return this._waiting_time
 	},
 	get delayable() {
-		return this._delayable
+		return this.is_conf_setted("delayable") ? this._delayable : true;
 	},
 	set waiting_time(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key) && this.group[key].waiting_time == null)
+				if(this.group.hasOwnProperty(key) && !this.group[key].is_conf_setted("waiting_time"))
 					this.group[key].waiting_time = data;
 			}
 		}
@@ -44,7 +47,7 @@ Acumulator.prototype = {
 	set delayable(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key) && this.group[key].delayable == null)
+				if(this.group.hasOwnProperty(key) && !this.group[key].is_conf_setted("delayable"))
 					this.group[key].delayable = data;
 			}
 		}
@@ -106,6 +109,7 @@ Acumulator.prototype = {
 	data:			null,
 	is_group:		false,
 	group:			null,
+	_pushed:		false,
 	callback:		function(data) {
 		console.log(JSON.stringify(data));
 	},
@@ -115,8 +119,11 @@ Acumulator.prototype = {
 		}
 	},
 	condition:	{
-		online:			function() {
+		online:		function() {
 			return navigator.onLine;
+		},
+		offline:	function() {
+			return !navigator.onLine;
 		}
 	},
 	agregator:	{
@@ -150,7 +157,7 @@ Acumulator.prototype = {
 	set condition2exec(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key) && this.group[key].condition2exec == null)
+				if(this.group.hasOwnProperty(key) && !this.group[key].is_conf_setted("condition2exec"))
 					this.group[key].condition2exec = data;
 			}
 		}
@@ -179,7 +186,8 @@ Acumulator.prototype = {
 			}
 		}
 		this.tid = null;
-		this.callback.call(this, this.data.val);
+		if(this._pushed) this.callback.call(this, this.data.val);
+		this._pushed = false;
 		this.data.val = null;
 		localStorage.removeItem(this.storageKey);
 	},
@@ -189,6 +197,7 @@ Acumulator.prototype = {
 		} catch(e){}
 	},
 	push:			function(value) {
+		this._pushed = true;
 		if(this.is_group) {
 			for(var key in this.group) {
 				if(this.group.hasOwnProperty(key))
