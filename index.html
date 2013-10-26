@@ -6,25 +6,25 @@
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
 				window.acum = new Acumulator({
-					onoff:	[
-							"the_first_one",
-							function(cmd) {
-								var stat = onoff.querySelector("span#status");
-								if(cmd == "toggle") {
-									stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
-								}
-							}
-						],
-					sum:	[
-							"somatory",
-							function(value) {
-								var stat = sum.querySelector("span#status");
-								stat.innerHTML = parseInt(stat.innerHTML) + value;
-							}
-						],
+					onoff:	{
+							_agregator_func:	"the_first_one",
+							_callback:		function(cmd) {
+											var stat = onoff.querySelector("span#status");
+											if(cmd == "toggle") {
+												stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
+											}
+										}
+						},
+					sum:	{
+							_agregator_func:	"somatory",
+							_callback:		function(value) {
+											var stat = sum.querySelector("span#status");
+											stat.innerHTML = parseInt(stat.innerHTML) + value;
+										}
+						},
 					form:	{
-							agregator_func: "the_last_one",
-							callback:	function(parentForm) {
+							_agregator_func: "the_last_one",
+							_callback:	function(parentForm) {
 										var elem = parentForm.elements;
 										for(var i = 0; i < elem.length; i++) {
 											if(! elem[i].name) continue;
@@ -34,23 +34,22 @@
 									}
 						},
 					save:	{
-							agregator_func: "the_last_one",
-							callback:	function(data) {
+							_agregator_func: "the_last_one",
+							_callback:	function(data) {
 										var save = document.querySelector("span#save");
 										save.innerHTML = "saving...";
 										setTimeout(function(){
 											save.innerHTML = "";
 										}, 3000);
 									},
-							condition2exec:	function() {
-								return navigator.onLine;
-							}
+							_waiting_time:	2000
 						},
+					_condition2exec:	function() {
+						return navigator.onLine;
+					},
+					_waiting_time: 500
 				});
-				window.acum.condition2exec = function(){return navigator.onLine};
 				window.addEventListener('online', function(){window.acum.try2run()});
-				window.acum.waiting_time = 500;
-				window.acum.sub("save").waiting_time = 2000;
 			}, false);
 		</script>
 		<button id="onoff" onclick="window.acum.sub(this.id).push('toggle')">

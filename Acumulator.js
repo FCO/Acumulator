@@ -1,58 +1,38 @@
-function Acumulator(agregator_func, callback) {
+function Acumulator(conf) {
 	this.group = {};
 	this.id = Acumulator.next_id++;
-	if(agregator_func instanceof Object) {
-		this.is_group = true;
-		for(var key in agregator_func) {
-			if(agregator_func.hasOwnProperty(key)) {
-				if(agregator_func[key] instanceof Array)
-					this.group[key] = new Acumulator(agregator_func[key][0], agregator_func[key][1]);
-				else {
-					this.group[key] = new Acumulator(agregator_func[key].agregator_func, agregator_func[key].callback);
-					if(agregator_func[key].condition2exec != null) {
-						this.group[key].condition2exec = agregator_func[key].condition2exec;
-					}
-				}
-			}
-		}
-	} else if(callback instanceof Object && !callback instanceof Function) {
-		this.is_group = true;
-		for(var key in callback) {
-			if(callback.hasOwnProperty(key)) {
-				this.group[key] = new Acumulator(agregator_func, callback[key]);
-				if(callback[key].condition2exec != null) {
-					this.group[key].condition2exec = callback[key].condition2exec;
-				}
-			}
-		}
-	} else {
-		this.agregator_func = this.agregator.the_last_one;
-		if(callback)
-			this.callback = callback;
-		if(agregator_func) {
-			if(agregator_func instanceof Function) {
-				this.agregator_func = agregator_func;
+	for(var key in conf) {
+		if(conf.hasOwnProperty(key)) {
+			if(key.substr(0, 1) != "_") {
+				this.is_group = true;
+				this.group[key] = new Acumulator(conf[key]);
 			} else {
-				if(this.agregator[agregator_func]) {
-					this.agregator_func = this.agregator[agregator_func];
-				} else {
-					throw "Agregator function '" + agregator_func + "' does not exists."
-				}
+				var nameKey = key.substr(1, key.length);
+				this[nameKey] = conf[key];
 			}
-		}
-		if(localStorage.getItem(this.storageKey) != null) {
-			this.data = JSON.parse(localStorage.getItem(this.storageKey));
-		} else {
-			this.data		= {val: null};
 		}
 	}
+	if(this.agregator_func == null) this.agregator_func = this.agregator.the_last_one;
+	if(!(this.agregator_func instanceof Function)) {
+		if(this.agregator[this.agregator_func]) {
+			this.agregator_func = this.agregator[this.agregator_func];
+		} else {
+			throw "Agregator function '" + agregator_func + "' does not exists."
+		}
+	}
+	if(localStorage.getItem(this.storageKey) != null) {
+		this.data = JSON.parse(localStorage.getItem(this.storageKey));
+	} else {
+		this.data		= {val: null};
+	}
+	
 }
 
 Acumulator.next_id = 0;
 
 Acumulator.prototype = {
-	_waiting_time:		3000,
-	_delayable:		true,
+	_waiting_time:		null,
+	_delayable:		null,
 	get waiting_time() {
 		return this._waiting_time
 	},
@@ -62,7 +42,7 @@ Acumulator.prototype = {
 	set waiting_time(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key))
+				if(this.group.hasOwnProperty(key) && this.group[key].waiting_time == null)
 					this.group[key].waiting_time = data;
 			}
 		}
@@ -71,7 +51,7 @@ Acumulator.prototype = {
 	set delayable(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key))
+				if(this.group.hasOwnProperty(key) && this.group[key].delayable == null)
 					this.group[key].delayable = data;
 			}
 		}
@@ -112,16 +92,14 @@ Acumulator.prototype = {
 			this.val	+= value;
 		},
 	},
-	_condition2exec:	function(data) {
-		return true;
-	},
+	_condition2exec:	null,
 	get condition2exec() {
 		return this._condition2exec;
 	},
 	set condition2exec(data) {
 		if(this.is_group) {
 			for(var key in this.group) {
-				if(this.group.hasOwnProperty(key))
+				if(this.group.hasOwnProperty(key) && this.group[key].condition2exec == null)
 					this.group[key].condition2exec = data;
 			}
 		}
@@ -132,7 +110,7 @@ Acumulator.prototype = {
 	},
 	try2run:		function() {
 		if(this.data == null) this.data = {val: null};
-		if(!this.condition2exec()) {
+		if(this.condition2exec != null && !this.condition2exec()) {
 			return false;
 		}
 		if(this.is_group) {
@@ -160,7 +138,7 @@ Acumulator.prototype = {
 		} else {
 			this.agregator_func.call(this.data, value);
 			if(this.persistData) this.persistData();
-			if(this.tid && this.delayable) {
+			if(this.tid && (this.delayable == null || this.delayable)) {
 				clearTimeout(this.tid);
 				this.tid = null;
 			}
@@ -168,7 +146,7 @@ Acumulator.prototype = {
 				var _this = this;
 				this.tid = setTimeout(function(){
 					_this.try2run();
-				}, this.waiting_time);
+				}, (this.waiting_time != null ? this.waiting_time : 3000));
 			}
 		}
 	},
