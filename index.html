@@ -61,11 +61,9 @@
 							_push_data_on_event:	{
 											obj:	document.querySelector("textarea"),
 											event:	"keyup",
-											data:	"bla"
-//											data:	function() {
-//console.log(this);
-//												return this.value;
-//											}
+											data:	function() {
+												return this.value;
+											}
 										}
 						},
 					_condition2exec: "online",
