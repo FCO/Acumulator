@@ -1,0 +1,19 @@
+        <script src=../Acumulator.js></script>
+        <script>
+		document.addEventListener("DOMContentLoaded", function() {
+                	window.acum = new Acumulator({
+				_waiting_time:          300,
+                	        _agregator_func:        "the_last_one",
+                	        _callback:               function(data) {
+                	                var sum = 0;
+                	                for(var i = 0; i < data.length; i++) {
+						if(data[i] == null || data[i] == "") break;
+                	                        sum += parseInt(data[i]);
+                	                }
+                	                document.querySelector('spam#soma').innerHTML = sum;
+                	        }
+                	});
+		});
+        </script>
+        <input onkeyup="window.acum.push(this.value.split(' '))"><br />
+        Soma: <spam id=soma></spam>

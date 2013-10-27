@@ -1,0 +1,113 @@
+Acumulator.js
+===============
+
+Acumulator.js é uma biblioteca javascript para agrupar eventos. Com ele é possivel agrupar de diversas formas... talvez seja melhor um exemplo:
+
+Se quisermos, por exemplo, usar um <input> de texto e ao digitarmos numeros nele quisermos alterar o conteudo de um <spam> para a soma de todos os numeros do <input>.
+
+Podemos fazer assim (http://fco.github.io/Acumulator/examples/sum_numbers_wout_acumulator.html):
+
+<code>
+	<input onkeyup="var nums = this.value.split(' '); var sum = 0; for(var i = 0; i < nums.length; i++) sum += nums[i]; document.querySelector('spam#soma').innerHTML = sum"><br />
+	Soma: <spam id=soma></spam>
+</code>
+
+Mas assim, a cada caracter q vc digitar (não só caracteres, qq tecla), executará todo esse onkeyup.
+Com o Acumulator.js vc pode fazer assim (http://fco.github.io/Acumulator/examples/sum_numbers_with_acumulator_1.html):
+
+<code>
+	<script src=../Acumulator.js></script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			window.acum = new Acumulator({
+				_agregator_func:	"the_last_one",
+				_callback:		function(data) {
+					var sum = 0;
+					for(var i = 0; i < data.length; i++) {
+						sum += parseInt(data[i]);
+					}
+					document.querySelector('spam#soma').innerHTML = sum;
+				},
+				_waiting_time:		300
+			});
+		});
+	</script>
+	<input onkeyup="window.acum.push(this.value.split(' '))"><br />
+	Soma: <spam id=soma></spam>
+</code>
+
+Pois bem... vamos linha a linha:
+
+	<script src=../Acumulator.js></script>
+
+Importa a biblioteca
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+
+Executa o script apos o load da DOM
+
+			window.acum = new Acumulator({
+
+Cria um novo objeto Acumulatos, passando um objeto de configurações.
+
+				_waiting_time:		300,
+
+Toda chave desse objeto de configuração começadas por "_" tem um significado especial
+Neste caso, _waiting_time indica qtos usecs deve esperar antes de chamar o callback
+
+				_agregator_func:	"the_last_one",
+
+_agregator_func é qual função deve ser usada para agregar os valores passados
+
+				_callback:		function(data) {
+					var sum = 0;
+					for(var i = 0; i < data.length; i++) {
+						sum += parseInt(data[i]);
+					}
+					document.querySelector('spam#soma').innerHTML = sum;
+				}
+
+_callback define a função a ser chamada após as agregações e o tempo do _waiting_time
+
+			});
+		});
+	</script>
+	<input onkeyup="window.acum.push(this.value.split(' '))"><br />
+
+push() envia o dado (' ') para ser agregado
+
+	Soma: <spam id=soma></spam>
+
+
+Uma forma melhor de fazer isso seria assim:
+
+        <script src=../Acumulator.js></script>
+        <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                        window.acum = new Acumulator({
+                                _waiting_time:          300,
+                                _agregator_func:        "the_last_one",
+                                _callback:               function(data) {
+                                        var sum = 0;
+                                        for(var i = 0; i < data.length; i++) {
+                                                if(data[i] == null || data[i] == "") break;
+                                                sum += parseInt(data[i]);
+                                        }
+                                        document.querySelector('spam#soma').innerHTML = sum;
+                                },
+                                _push_data_on_event:    {
+                                        obj:    "input#numbers",
+                                        event:  "keyup",
+                                        data:   function(evt) {
+                                                return document.querySelector("input#numbers").value.split(' ');
+                                        }
+                                },
+
+                        });
+                });
+        </script>
+        <input id="numbers"><br />
+        Soma: <spam id=soma></spam>
+
+Dessa forma, a delegação do evento fica delegada ao Acumulator.js, desacoplando seu script do HTML

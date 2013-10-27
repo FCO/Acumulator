@@ -1,0 +1,27 @@
+        <script src=../Acumulator.js></script>
+        <script>
+		document.addEventListener("DOMContentLoaded", function() {
+                	window.acum = new Acumulator({
+				_waiting_time:          300,
+                	        _agregator_func:        "the_last_one",
+                	        _callback:               function(data) {
+                	                var sum = 0;
+                	                for(var i = 0; i < data.length; i++) {
+						if(data[i] == null || data[i] == "") break;
+                	                        sum += parseInt(data[i]);
+                	                }
+                	                document.querySelector('spam#soma').innerHTML = sum;
+                	        },
+				_push_data_on_event:    {
+					obj:    "input#numbers",
+					event:  "keyup",
+					data:   function(evt) {
+						return document.querySelector("input#numbers").value.split(' ');
+					}
+				},
+
+                	});
+		});
+        </script>
+        <input id="numbers"><br />
+        Soma: <spam id=soma></spam>
