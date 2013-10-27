@@ -85,7 +85,7 @@ Uma forma melhor de fazer isso seria assim:
         <script src=../Acumulator.js></script>
         <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                        window.acum = new Acumulator({
+                        new Acumulator({
                                 _waiting_time:          300,
                                 _agregator_func:        "the_last_one",
                                 _callback:               function(data) {
@@ -111,3 +111,21 @@ Uma forma melhor de fazer isso seria assim:
         Soma: <spam id=soma></spam>
 
 Dessa forma, a delegação do evento fica delegada ao Acumulator.js, desacoplando seu script do HTML
+A parte nova é essa:
+
+                                _push_data_on_event:    {
+
+_push_data_on_event diz ao Acumulator,js para observar 1 ou mais eventos em 1 ou mais objetos passando um dado, que pode ser simplesmente uma string, um objeto ou uma função, caso seja uma função, ela será executada no momento do evento e seu retorno será usado como dado
+
+                                        obj:    "input#numbers",
+
+O objeto a ser "ouvido" pode ser uma string (querySelectorAll), um objeto, um Array de objetos ou um NodeList
+
+                                        event:  "keyup",
+
+string do nome do evento
+
+                                        data:   function(evt) {
+                                                return document.querySelector("input#numbers").value.split(' ');
+                                        }
+                                },

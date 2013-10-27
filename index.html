@@ -6,48 +6,66 @@
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
 				window.acum = new Acumulator({
+					// every non "_" preappended key creates a new sub object with that name
+					// creates the "onoff" sub object
 					onoff:	{
+							// every "_" preappended key declares a conf
+							// the "onoff" sub object uses the "the_first_one" as agregator func
+							// the "the_first_one" func gets the data from the first push() and ignores
+							// every other push() call
 							_agregator_func:	"the_first_one",
+							// sets the "onoff" sub object callback
 							_callback:		function(cmd) {
 											var stat = onoff.querySelector("span#status");
 											if(cmd == "toggle") {
 												stat.innerHTML = stat.innerHTML == "on" ? "off" : "on";
 											}
 										},
+							// creates a new event to call the push() func passing the string "toggle" as data
 							_push_data_on_event:	{
-											obj:	document.querySelector("button#onoff"),
+											obj:	"button#onoff",
 											event:	"click",
 											data:	"toggle"
 										},
+							// set the the "onoff" sub object should not delay after a new push
 							_delayable: false
 						},
+					// creates the "sum" sub object
 					sum:	{
+							// set the agregator function to the "sum" submodule
+							// the "somatory" agregator adds every data push()ed
 							_agregator_func:	"somatory",
+							// set the callback
 							_callback:		function(value) {
 											var stat = sum.querySelector("span#status");
 											stat.innerHTML = parseInt(stat.innerHTML) + value;
 										},
+							// creates a new event to call the push() func passing the number 1 as data
 							_push_data_on_event:	{
-											obj:	document.querySelector("button#sum"),
+											obj:	"button#sum",
 											event:	"click",
 											data:	1
 										},
+							// set the the "sum" sub object should not delay after a new push
 							_delayable: false
 						},
 					form:	{
+							// the "the_last_one" uses only the last data push()ed
 							_agregator_func: "the_last_one",
-							_callback:	function(parentForm) {
-										var elem = parentForm.elements;
+							_callback:	function() {
+										var elem = document.forms[0].elements;
 										for(var i = 0; i < elem.length; i++) {
 											if(! elem[i].name) continue;
 											var vkey = document.querySelector("td#" + elem[i].name);
 											vkey.innerHTML = elem[i].value;
 										}
 									},
+							// the data that will be push()ed contains DOM objects that contains internal loop references
+							// this will not be saved on localstorage
 							_push_data_on_event:	{
 											obj:	document.forms[0].querySelectorAll("input"),
 											event:	"keyup",
-											data:	document.forms[0]
+											data:	""
 										}
 						},
 					save:	{
@@ -59,17 +77,39 @@
 											save.innerHTML = "";
 										}, 3000);
 									},
+							// Changing the default waiting time to the "save" sub object
 							_waiting_time:	2000,
 							_push_data_on_event:	{
-											obj:	document.querySelector("textarea"),
+											obj:	"textarea",
 											event:	"keyup",
 											data:	function() {
 												return this.value;
 											}
 										},
-							_condition2exec:	"data_has_changed"
+							_condition2exec:	["data_has_changed"]
+							// The "save" sub object has a custom condition to exec the calback
+							//_condition2exec:	["online", "data_has_changed"]
 						},
-					_condition2exec: "online",
+					mouse:	{
+							_agregator_func: "the_last_one",
+							_callback:	function(data) {
+										console.log("MOUSE: (" + data.x + ", " + data.y + ")");
+									},
+							_waiting_time:	300,
+							_delayable: false,
+							_push_data_on_event:	{
+											obj:	document.body,
+											event:	"mousemove",
+											data:	function(evt) {
+												return {x: evt.pageX, y: evt.pageY, date: new Date()};
+											}
+										},
+						},
+					// This is the condition to the object and every sub object (unless it overrides it)
+					// call the callback
+					//_condition2exec: "online"
+					// This is the time the object and every sub object (unless it overrides it)
+					// will wait before calling the callback
 					_waiting_time: 500,
 					_retry_on_event: {
 						obj:	window,
