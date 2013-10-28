@@ -80,8 +80,9 @@ push() envia o dado (' ') para ser agregado
 	Soma: <spam id=soma></spam>
 
 
-Uma forma melhor de fazer isso seria assim:
+Uma forma melhor de fazer isso seria assim (http://fco.github.io/Acumulator/examples/sum_numbers_with_acumulator_2.html):
 
+<code>
         <script src=../Acumulator.js></script>
         <script>
                 document.addEventListener("DOMContentLoaded", function() {
@@ -109,6 +110,7 @@ Uma forma melhor de fazer isso seria assim:
         </script>
         <input id="numbers"><br />
         Soma: <spam id=soma></spam>
+</code>
 
 Dessa forma, a delegação do evento fica delegada ao Acumulator.js, desacoplando seu script do HTML
 A parte nova é essa:
