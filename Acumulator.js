@@ -18,7 +18,15 @@ function Acumulator(conf) {
 	} else {
 		this.data		= null;
 	}
-	
+	if(this._is_conf_setted("try_before_unload")) {
+		this.push_data_on_event =	{
+							obj:	window,
+							event:	"beforeunload",
+							data:	function() {
+								return this.try2run() ? null : this.try_before_unload
+							}
+						};
+	}
 }
 
 Acumulator.debug = false;
@@ -73,7 +81,40 @@ Acumulator.prototype = {
 			return actual;
 		},
 	},
+	_filter_data:		null,
 // attributes with custtom gatters and setters
+	// try_before_unload
+	// function
+	// time to wait after call the callback function
+	_try_before_unload:		null,
+	get try_before_unload() {
+		return this._try_before_unload
+	},
+	set try_before_unload(data) {
+		if(this.is_group) {
+			for(var key in this.group) {
+				if(this.group.hasOwnProperty(key) && !this.group[key]._is_conf_setted("try_before_unload"))
+					this.group[key].try_before_unload = data;
+			}
+		}
+		this._try_before_unload = data;
+	},
+	// filter
+	// function
+	// time to wait after call the callback function
+	_filter:		null,
+	get filter() {
+		return this._filter
+	},
+	set filter(data) {
+		if(this.is_group) {
+			for(var key in this.group) {
+				if(this.group.hasOwnProperty(key) && !this.group[key]._is_conf_setted("filter"))
+					this.group[key].filter = data;
+			}
+		}
+		this._filter = data;
+	},
 	// waiting_time
 	// integer: usec
 	// time to wait after call the callback function
@@ -143,7 +184,8 @@ Acumulator.prototype = {
 	},
 	set push_data_on_event(data) {
 		var _this = this;
-		this._push_data_on_event = data;
+		if(!this._is_conf_setted("push_data_on_event")) this._push_data_on_event = [];
+		this._push_data_on_event.push(data);
 		this._add_event_listener({
 			obj:	data.obj,
 			event:	data.event,
@@ -230,6 +272,7 @@ Acumulator.prototype = {
 		this._last_data = this.data;
 		this.data = null;
 		localStorage.removeItem(this._storageKey);
+		return true;
 	},
 	persistData:		function() {
 		this._log("persistData");
@@ -238,6 +281,8 @@ Acumulator.prototype = {
 	push:			function(value) {
 		this._log("push");
 		this._pushed = true;
+		if(this._filter_data == null) this._filter_data = {};
+		if(this._is_conf_setted("filter") && !this.filter.call(this._filter_data, value)) return false;
 		if(this.is_group) {
 			for(var key in this.group) {
 				if(this.group.hasOwnProperty(key))
@@ -256,7 +301,7 @@ Acumulator.prototype = {
 				_this.try2run();
 			}, (this.waiting_time != null ? this.waiting_time : 3000));
 		}
-		
+		return true;
 	},
 // private methods
 	// log

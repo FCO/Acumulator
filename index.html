@@ -86,15 +86,28 @@
 												return this.value;
 											}
 										},
-							_condition2exec:	["data_has_changed"]
-							// The "save" sub object has a custom condition to exec the calback
-							//_condition2exec:	["online", "data_has_changed"]
+							// The "save" sub object has a custom condition to exec the callback
+							_condition2exec:	["online", "data_has_changed"]
 						},
 					mouse:	{
-							_agregator_func: "the_last_one",
+							_agregator_func: "acumulate_array",
 							_callback:	function(data) {
-										console.log("MOUSE: (" + data.x + ", " + data.y + ")");
+										console.log(data);
 									},
+							_filter:	function(data) {
+								var last_data = this.data;
+								var ret;
+								if(last_data != null) {
+									var delta = {x: data.x - last_data.x, y: data.y - last_data.y};
+									var mod;
+									if(delta.x == 0) mod = delta.y;
+									if(delta.y == 0) mod = delta.x;
+									if(mod == null) mod = Math.sqrt(Math.pow(delta.x), Math.pow(delta.y));
+									ret = mod > 5;
+								}
+								this.data = data;
+								return ret;
+							},
 							_waiting_time:	300,
 							_delayable: false,
 							_push_data_on_event:	{
@@ -107,7 +120,7 @@
 						},
 					// This is the condition to the object and every sub object (unless it overrides it)
 					// call the callback
-					//_condition2exec: "online"
+					_condition2exec: "online",
 					// This is the time the object and every sub object (unless it overrides it)
 					// will wait before calling the callback
 					_waiting_time: 500,
