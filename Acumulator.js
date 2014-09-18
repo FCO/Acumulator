@@ -183,20 +183,26 @@ Acumulator.prototype = {
 		return this._push_data_on_event;
 	},
 	set push_data_on_event(data) {
-		var _this = this;
-		if(!this._is_conf_setted("push_data_on_event")) this._push_data_on_event = [];
-		this._push_data_on_event.push(data);
-		this._add_event_listener({
-			obj:	data.obj,
-			event:	data.event,
-			func:	function(evt) {
-				_this.push(
-					data.data != null && data.data instanceof Function
-						? data.data.call(this, evt)
-						: data.data
-				)
+		if(data instanceof Array) {
+			for(var i = 0; i < data.length; i++) {
+				this.push_data_on_event = data[i];
 			}
-		});
+		} else {
+			var _this = this;
+			if(!this._is_conf_setted("push_data_on_event")) this._push_data_on_event = [];
+			this._push_data_on_event.push(data);
+			this._add_event_listener({
+				obj:	data.obj,
+				event:	data.event,
+				func:	function(evt) {
+					_this.push(
+						data.data != null && data.data instanceof Function
+							? data.data.call(this, evt)
+							: data.data
+					)
+				}
+			});
+		}
 	},
 
 	// retry_on_event
